@@ -1,0 +1,7 @@
+dm-control==1.0.14
+mujoco==2.3.7
+gymnasium==0.26.3
+torch
+numpy
+jupyter
+matplotlib
