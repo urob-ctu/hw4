@@ -52,11 +52,11 @@ def value_loss(values, value_targets):
     # TODO: compute the value function L2 loss
     return value_loss
 
-def PPO_loss(p_ratios, advantage_estimates, epsilon):
+def ppo_loss(p_ratios, advantage_estimates, epsilon):
     """ given (T, N) p_ratios probability ratios, (T, N) advantage_estimates, and epsilon clipping ratio,
     compute the scalar loss for pytorch based on the PPO surrogate objective"""
-    ppo_loss = torch.tensor(0.)  # placeholder
+    policy_loss = torch.tensor(0.)  # placeholder
 
     # TODO: compute the PPO loss
-    return ppo_loss
+    return policy_loss
 
