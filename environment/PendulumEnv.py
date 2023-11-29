@@ -81,10 +81,6 @@ class PendulumEnv(extendedEnv, utils.EzPickle):
                 height = np.cos(state_i[1])
 
             rew = height
-            # rew = np.cos(state_i[1]) - 0.1*state_i[0]**2 - 0.2*actions[i]**2
-            # rew = abs(state_i[1]) < 0.1
-            if pos[0] > 0.9 or pos[0] < -0.9:
-                rew -= 20
             rewards.append(rew)
 
         if self.render_mode == 'human':  # if rendering is enabled, render after each simulation step
