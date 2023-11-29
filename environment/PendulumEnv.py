@@ -32,6 +32,8 @@ class PendulumEnv(extendedEnv, utils.EzPickle):
         else:
             self.num_states = 4
 
+        self.num_actions = 1
+
         self.observation_space = Box(low=-np.inf, high=np.inf, shape=(self.num_states, ), dtype=np.float32)
         self.action_space = Box(low=-1, high=1, shape=(1,), dtype=np.float32, seed=self.np_random)
         model = mjcf_to_mjmodel(make_pendulum_sim(self.num_pends, self.frequency, self.double))  # create a mujoco model
