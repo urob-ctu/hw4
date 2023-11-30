@@ -131,6 +131,51 @@ def make_walker(id=0, hue=1):
 
     return model
 
+def make_quadwalker(id=0, hue=1):
+
+    rgba = [0, 0, 0, 1]
+    rgba[:3] = hsv_to_rgb([hue, 1, 1])
+    rgba_transparent = [0, 0, 0, 0.6]
+    rgba_transparent[:3] = rgba[:3]
+
+    model = mjcf.RootElement(model='walker_%d' % id)
+
+    model.default.geom.type = 'box'
+    model.default.geom.rgba = rgba
+    model.default.geom.conaffinity = 0
+    model.default.geom.contype = 1
+    model.default.geom.condim = 3
+    model.default.geom.friction = (1, 0.5, 0.5)
+    model.default.geom.margin = 0
+
+    model.default.joint.damping = 2
+    model.default.joint.armature = 0.15
+
+    body = model.worldbody.add('body', name='walker_body%d' % id, pos=(0, 0, 0))
+    body.add('geom', name='torso', type='capsule', size=[0.1, 0.2], mass=1.5, euler=[0, np.pi/2, 0])
+
+    legs = ['lf', 'rf', 'lb', 'rb']
+    # make a spot-like dog robot
+    positions = [[0.2, 0.13, 0], [0.2, -0.13, 0], [-0.2, 0.13, 0], [-0.2, -0.13,0]]
+    for i, leg in enumerate(legs):
+        pos = positions[i]
+        x_off = 0.1 if i < 2 else -0.1
+        y_off = 0.1*(-1)**i
+        thigh = body.add('body', name='%s_thigh' % leg, pos=pos)
+        hip = thigh.add('joint', name='%s_hip' % leg, type='hinge', axis=[0, 0, 1], range=[-0.5, 0.5], limited='true')
+        thigh.add('geom', name='%s_thigh' % leg, type='capsule', fromto=[0,0,0,x_off,y_off,0], size=[0.05], rgba=[0.3, 0.3, 0.3, 1], mass=0.4)
+        shin = thigh.add('body', name='shin_%d' % i, pos=[x_off, y_off, 0])
+
+        knee_axis = [-y_off, x_off, 0]
+
+        knee = shin.add('joint', name='knee_%d' % i, type='hinge', axis=knee_axis, range=[-1, 1], limited='true')
+        shin.add('geom', name='shin_%d' % i, type='capsule', fromto=[0,0,0,0,0,-0.25], size=[0.03], rgba=[0.3, 0.3, 0.3, 1], mass=0.2)
+
+        model.actuator.add('motor', name='%s_hip_motor%d' % (leg, id), joint=hip, gear=[60, 0, 0, 0, 0, 0], ctrllimited=True, ctrlrange=(-1, 1))
+        model.actuator.add('motor', name='%s_knee_motor%d' % (leg, id), joint=knee, gear=[40, 0, 0, 0, 0, 0], ctrllimited=True, ctrlrange=(-1, 1))
+
+    return model
+
 def make_walker_sim(num_walkers=1, frequency=100):
     arena = mjcf.RootElement(model='arena')
 
@@ -156,7 +201,7 @@ def make_walker_sim(num_walkers=1, frequency=100):
 
     arena.worldbody.add('light', directional='true', name='light', pos=[0, 0, 10], dir=[0, 0, -1.3])
 
-    walkers = [make_walker(i, i/num_walkers) for i in range(num_walkers)]
+    walkers = [make_quadwalker(i, i/num_walkers) for i in range(num_walkers)]
     height = 1
     sz = np.ceil(np.sqrt(num_walkers)).astype(int)
     dist = 1

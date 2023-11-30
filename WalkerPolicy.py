@@ -2,7 +2,7 @@ import torch
 from torch import nn
 
 class WalkerPolicy(nn.Module):
-    def __init__(self, state_dim=21, action_dim=4):
+    def __init__(self, state_dim=29, action_dim=8):
         super().__init__()
         # self.load_weights()  # load learned stored network weights after initialization
 

@@ -6,9 +6,9 @@ import numpy as np
 from copy import copy
 
 def default_reward(state, action):
-    """reward function for the walker environment, state is (21,) vector, action is (4,) vector"""
-    pos = state[:11]  # first 11 elements of state vector are generalized coordinates [xyz, quat, joint_angles]
-    vel = state[11:]  # last 10 elements of state vector are generalized velocities [xyz, omega, joint_velocities]
+    """reward function for the walker environment, state is [29] vector, action is [8] vector"""
+    pos = state[:15]  # first 15 elements of state vector are generalized coordinates [xyz, quat, joint_angles]
+    vel = state[15:]  # last 14 elements of state vector are generalized velocities [xyz_vel, omega, joint_velocities]
     return vel[0]  # return the x velocity as the reward by default
 
 base_config = {
@@ -36,8 +36,8 @@ class WalkerEnv(extendedEnv, utils.EzPickle):
         self.skip_steps = 1
         self.frequency = 50
 
-        self.num_states = 21
-        self.num_actions = 4
+        self.num_states = 29
+        self.num_actions = 8
 
         self.observation_space = Box(low=-np.inf, high=np.inf, shape=(self.num_states, ), dtype=np.float32)
         self.action_space = Box(low=-1, high=1, shape=(4,), dtype=np.float32, seed=self.np_random)
@@ -62,6 +62,8 @@ class WalkerEnv(extendedEnv, utils.EzPickle):
             height=self.height
         )
 
+        assert self.num_states*self.num_walkers == self.init_qpos.shape[0] + self.init_qvel.shape[0]
+
         self.step_counter = 0
         self.prev_actions = np.zeros((self.num_walkers, 1))
 
@@ -76,7 +78,7 @@ class WalkerEnv(extendedEnv, utils.EzPickle):
         rewards = []
 
         for i in range(self.num_walkers):
-            pos_off, vel_off = 11, 10  # number of positions, velocities per walker
+            pos_off, vel_off = 15, 14  # number of positions, velocities per walker
             pos = copy(self.data.qpos[i*pos_off:(i+1)*pos_off])
             pos[0] -= self.init_qpos[i*pos_off] # compensate for the walker's initial x,y position
             pos[1] -= self.init_qpos[i*pos_off + 1]
@@ -90,14 +92,14 @@ class WalkerEnv(extendedEnv, utils.EzPickle):
         if self.render_mode == 'human':  # if rendering is enabled, render after each simulation step
             self.render()
 
-        self.prev_actions = ctrl.reshape((self.num_walkers, 4))
+        self.prev_actions = ctrl.reshape((self.num_walkers, self.num_actions))
 
         return states, rewards
 
     def _get_obs(self):
         states = []
         for i in range(self.num_walkers):
-            pos_off, vel_off = 11, 10
+            pos_off, vel_off = 15, 14  # number of positions, velocities per walker
             pos = copy(self.data.qpos[i*pos_off:(i+1)*pos_off])
             pos[0] -= self.init_qpos[i*pos_off]
             pos[1] -= self.init_qpos[i*pos_off + 1]  # subtract starting x,y position
