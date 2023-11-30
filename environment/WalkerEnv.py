@@ -5,9 +5,16 @@ from gymnasium.spaces import Box
 import numpy as np
 from copy import copy
 
+def default_reward(state, action):
+    """reward function for the walker environment, state is (21,) vector, action is (4,) vector"""
+    pos = state[:11]  # first 11 elements of state vector are generalized coordinates [xyz, quat, joint_angles]
+    vel = state[11:]  # last 10 elements of state vector are generalized velocities [xyz, omega, joint_velocities]
+    return vel[0]  # return the x velocity as the reward by default
+
 base_config = {
     'N': 1,
     'vis': 1,
+    'reward_fcn' : default_reward
 }
 
 class WalkerEnv(extendedEnv, utils.EzPickle):
@@ -57,6 +64,8 @@ class WalkerEnv(extendedEnv, utils.EzPickle):
 
         self.step_counter = 0
         self.prev_actions = np.zeros((self.num_walkers, 1))
+
+        self.reward_function = config.get('reward_fcn', default_reward)
         print('Environment ready')
 
     def vector_step(self, actions):
@@ -75,8 +84,7 @@ class WalkerEnv(extendedEnv, utils.EzPickle):
             state_i = np.concatenate((pos, vel), dtype=np.float32)
             states.append(state_i)
 
-            rew = pos[0]  # rewards is the forward distance in the x direction
-            # rew = vel[0]
+            rew = self.reward_function(state_i, ctrl[i*4:(i+1)*4])
             rewards.append(rew)  # reward is the negative sin of the angle
 
         if self.render_mode == 'human':  # if rendering is enabled, render after each simulation step
