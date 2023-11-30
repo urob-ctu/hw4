@@ -5,3 +5,4 @@ torch
 numpy
 jupyter
 matplotlib
+imageio
