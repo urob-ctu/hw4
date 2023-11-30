@@ -112,7 +112,7 @@ def make_walker(id=0, hue=1):
     model.default.joint.armature = 0.15
 
     body = model.worldbody.add('body', name='walker_body%d' % id, pos=(0, 0, 0))
-    body.add('geom', name='torso', type='capsule', size=[0.1, 0.1], mass=5)
+    body.add('geom', name='torso', type='capsule', size=[0.1, 0.1], mass=1.5)
 
     legs = ['left_leg', 'right_leg']
     positions = [[0, -0.13, -0.08], [0, 0.13, -0.08]]
@@ -120,14 +120,14 @@ def make_walker(id=0, hue=1):
         pos = positions[i]
         thigh = body.add('body', name='thigh_%d' % i, pos=pos)
         hip = thigh.add('joint', name='hip_%d' % i, type='hinge', axis=[0, 1, 0], range=[-2, 1.5], limited='true')
-        thigh.add('geom', name='thigh_%d' % i, type='capsule', pos=[0, 0, -0.16], size=[0.05, 0.17], rgba=[0.3, 0.3, 0.3, 0.9], mass=0.3)
+        thigh.add('geom', name='thigh_%d' % i, type='capsule', pos=[0, 0, -0.16], size=[0.05, 0.17], rgba=[0.3, 0.3, 0.3, 0.9], mass=0.4)
         shin = thigh.add('body', name='shin_%d' % i, pos=[0, 0, -0.3])
         knee = shin.add('joint', name='knee_%d' % i, type='hinge', axis=[0, 1, 0], range=[-0.2, 2.5], limited='true')
-        shin.add('geom', name='shin_%d' % i, type='capsule', pos=[0, 0, -0.15], size=[0.045, 0.15], rgba=[0.3, 0.3, 0.3, 1], mass=0.3)
+        shin.add('geom', name='shin_%d' % i, type='capsule', pos=[0, 0, -0.15], size=[0.045, 0.15], rgba=[0.3, 0.3, 0.3, 1], mass=0.2)
         shin.add('geom', name='foot_%d' % i, type='box', pos=[0.04, 0, -0.3], size=[0.09, 0.07, 0.04], rgba=[0.3, 0.3, 0.3, 1], mass=0.1)
 
-        model.actuator.add('motor', name='%s_hip%d' % (leg, id), joint=hip, gear=[80, 0, 0, 0, 0, 0], ctrllimited=True, ctrlrange=(-1, 1))
-        model.actuator.add('motor', name='%s_knee%d' % (leg, id), joint=knee, gear=[40, 0, 0, 0, 0, 0], ctrllimited=True, ctrlrange=(-1, 1))
+        model.actuator.add('motor', name='%s_hip%d' % (leg, id), joint=hip, gear=[120, 0, 0, 0, 0, 0], ctrllimited=True, ctrlrange=(-1, 1))
+        model.actuator.add('motor', name='%s_knee%d' % (leg, id), joint=knee, gear=[70, 0, 0, 0, 0, 0], ctrllimited=True, ctrlrange=(-1, 1))
 
     return model
 
