@@ -5,7 +5,7 @@ def policy_gradient_loss_simple(logp, tensor_r):
     compute the scalar loss for pytorch based on the policy gradient"""
     policy_loss = torch.tensor(0.)  # placeholder
 
-    with torch.no_grad():
+    # with torch.no_grad():
         # TODO: compute returns of the trajectories from the reward tensor
 
     # TODO: compute the policy loss with trajectory returns
@@ -30,7 +30,7 @@ def policy_gradient_loss_discounted(logp, tensor_r, gamma):
     on the policy gradient with discounted returns"""
     policy_loss = torch.tensor(0.)  # placeholder
 
-    with torch.no_grad():
+    # with torch.no_grad():
         # TODO: compute discounted returns of the trajectories from the reward tensor
 
     # TODO: compute the policy loss with discounted returns
